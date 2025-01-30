@@ -8,7 +8,7 @@ import torch.optim as optim
 from torchvision import transforms, datasets
 from tqdm import tqdm
 
-from model import resnet34
+from model import resnet50
 
 
 def main():
@@ -32,7 +32,6 @@ def main():
                                          transform=data_transform["train"])
     train_num = len(train_dataset)
 
-    # {'daisy':0, 'dandelion':1, 'roses':2, 'sunflower':3, 'tulips':4}
     flower_list = train_dataset.class_to_idx
     cla_dict = dict((val, key) for key, val in flower_list.items())
     # write dict into json file
@@ -58,10 +57,9 @@ def main():
     print("using {} images for training, {} images for validation.".format(train_num,
                                                                            val_num))
     
-    net = resnet34()
+    net = resnet50()
     # load pretrain weights
-    # download url: https://download.pytorch.org/models/resnet34-333f7ec4.pth
-    model_weight_path = "./resnet34-pre.pth"
+    model_weight_path = "./resnet50-pre.pth"
     assert os.path.exists(model_weight_path), "file {} does not exist.".format(model_weight_path)
     net.load_state_dict(torch.load(model_weight_path, map_location='cpu'))
     # for param in net.parameters():
@@ -69,7 +67,7 @@ def main():
 
     # change fc layer structure
     in_channel = net.fc.in_features
-    net.fc = nn.Linear(in_channel, 5)
+    net.fc = nn.Linear(in_channel, 2)
     net.to(device)
 
     # define loss function
@@ -79,9 +77,9 @@ def main():
     params = [p for p in net.parameters() if p.requires_grad]
     optimizer = optim.Adam(params, lr=0.0001)
 
-    epochs = 3
+    epochs = Epochs
     best_acc = 0.0
-    save_path = './resNet34.pth'
+    save_path = './resNet50.pth'
     train_steps = len(train_loader)
     for epoch in range(epochs):
         # train
