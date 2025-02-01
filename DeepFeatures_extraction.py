@@ -4,8 +4,9 @@ from PIL import Image
 import numpy as np
 import pandas as pd
 
-# 加载预训练的ResNet50模型
+# 加载预训练的ResNet50模型，去掉分类层
 model = models.resnet50(pretrained=True)
+model = torch.nn.Sequential(*list(model.children())[:-1])  # 去掉最后的全连接层
 model.eval()  # 将模型设置为评估模式（不进行训练）
 
 # 定义图像预处理
@@ -22,9 +23,10 @@ def extract_dl_features(image_path):
 
     # 使用ResNet50模型提取特征
     with torch.no_grad():  # 禁用梯度计算，节省内存
-        features = model(img_tensor)
+        features = model(img_tensor)  # 获取卷积特征
+        features = features.flatten()  # 展平特征向量
 
-    return features.flatten().numpy()  # 提取的特征并转化为numpy数组
+    return features.numpy()  # 返回NumPy数组
 
 # 提取T1和T2图像的深度学习特征
 t1_dl_features = extract_dl_features('path_to_t1_image.jpg')
