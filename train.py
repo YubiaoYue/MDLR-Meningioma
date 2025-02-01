@@ -37,7 +37,7 @@ def main():
     with open('class_indices.json', 'w') as json_file:
         json_file.write(json_str)
 
-    batch_size = 16
+    batch_size = 32
     nw = min([os.cpu_count(), batch_size if batch_size > 1 else 0, 8])  # number of workers
     print('Using {} dataloader workers every process'.format(nw))
 
@@ -73,9 +73,9 @@ def main():
 
     # construct an optimizer
     params = [p for p in net.parameters() if p.requires_grad]
-    optimizer = optim.Adam(params, lr=0.0001)
+    optimizer = optim.Adam(params, lr=0.01)
 
-    epochs = Epochs
+    epochs = 50
     best_acc = 0.0
     save_path = './resNet50.pth'
     train_steps = len(train_loader)
